@@ -283,9 +283,10 @@ function PICauction:AnnounceAuction()
     descAuc = string.format("%sLast auctioned %s for %s (on a winning bid of %s).", descAuc, self.auctioning_item, lastWin, lastBid)
   end
 
-  local bidformat
+  local bidformat, auclabel
   if self.dutch_quantity > 1 then bidformat = '"!bid 2x150"' else bidformat = '"!bid 150"' end
-  self:Announce(string.format("Now auctioning: %s. Whisper bids to %s in form %s", self.auctioning_item, GetUnitName("player", false), bidformat))
+  if self.dutch_quantity > 1 then auclabel = string.format("%s x %s", self.dutch_quantity, self.auctioning_item) else auclabel = self.auctioning_item end
+  self:Announce(string.format("Now auctioning: %s. Whisper bids to %s in form %s", auclabel, GetUnitName("player", false), bidformat))
   if #descAuc > 0 then
     self:Announce(descAuc)
   end
