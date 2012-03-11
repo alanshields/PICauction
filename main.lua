@@ -58,8 +58,6 @@ function PICauction:OnInitialize()
   self.db = LibStub("AceDB-3.0"):New("PICauctionDB", PICauction.defaults)
 
   self:ClearAuction()
-
-  self:Print(self.version.." Loaded")
 end
 
 function PICauction:GetOptions()
@@ -178,7 +176,6 @@ function PICauction:HandleBid(event, msg, author, arg3, arg4, arg5, arg6, arg7, 
 
   if self:HasOngoingAuction() then
     if price then
-      self:Print("Got bid", price, author, quantity)
       self:RegisterBid(author, price, quantity)
 
       if self.dutch_quantity == 1 then
