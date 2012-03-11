@@ -94,7 +94,13 @@ function PICauction:EndAuction()
 end
 
 function PICauction:Announce(msg)
-  self:Print(msg)
+  if UnitInRaid("player") then
+    SendChatMessage(msg, "RAID")
+  elseif 0 < GetNumPartyMembers() then
+    SendChatMessage(msg, "PARTY")
+  else
+    self:Print(msg)
+  end
 end
 
 function PICauction:GetWinners()
