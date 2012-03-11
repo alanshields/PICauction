@@ -162,7 +162,7 @@ function PICauction:ReportWinner(reportfunc)
       reportfunc(self, string.format("%s won %s with a bid of %s. %s pays %s", a.who, self.auctioning_item, a.originalbid, a.who, a.bid))
     else
       for k,v in ipairs(winners) do
-        reportfunc(self, string.format("%s won %sx%s with a bid of %s. %s pays %s apiece for a total of %s", v.who, v.quantity, self.auctioning_item, v.originalbid, v.who, v.bid, v.quantity * v.bid))
+        reportfunc(self, string.format("%s won %s x %s with a bid of %s. %s pays %s apiece for a total of %s", v.who, v.quantity, self.auctioning_item, v.originalbid, v.who, v.bid, v.quantity * v.bid))
       end
     end
   end
