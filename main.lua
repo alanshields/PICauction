@@ -33,6 +33,14 @@ PICauction.options = {
 }
 
 PICauction.defaults = {
+  profile = {
+    items = {
+      ['*'] = {
+        originalbid = nil,
+        bid = nil,
+      },
+    },
+  },
 }
 
 local channels = {"CHAT_MSG_SAY", "CHAT_MSG_YELL", "CHAT_MSG_WHISPER", "CHAT_MSG_BN_WHISPER", "CHAT_MSG_GUILD", "CHAT_MSG_OFFICER"}
@@ -91,6 +99,12 @@ end
 
 function PICauction:EndAuction()
   self.has_ongoing_auction = false
+
+  local winners = self:GetWinners()
+  if #winners > 0 then
+    self.db.profile.items[self.auctioning_item].originalbid = winners[1].originalbid
+    self.db.profile.items[self.auctioning_item].bid = winners[1].bid
+  end
 end
 
 function PICauction:Announce(msg)
@@ -248,7 +262,7 @@ end
 
 function PICauction:AnnounceAuction()
   -- TODO: auctioneer price, last previous win price
-  local auctioneerPrice, lastWin, descAuc = nil, nil, ""
+  local auctioneerPrice, lastWin, lastBid, descAuc = nil, nil, nil, ""
   if _G.AucAdvanced then
     auctioneerPrice = AucAdvanced.GetModule("Stat", "Simple").GetPrice(self.auctioning_item)
     if auctioneerPrice and auctioneerPrice > 0 then
@@ -256,6 +270,10 @@ function PICauction:AnnounceAuction()
     else
       auctioneerPrice = nil
     end
+  end
+  if self.db.profile.items[self.auctioning_item].bid then
+    lastBid = self.db.profile.items[self.auctioning_item].originalbid
+    lastWin = self.db.profile.items[self.auctioning_item].bid
   end
 
   if auctioneerPrice then
