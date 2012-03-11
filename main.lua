@@ -213,7 +213,6 @@ end
 
 function PICauction:StartBasicAuction(info, item_spec)
   quantity, item = string.match(item_spec, "^%s*(%d+)%s*x%s*(.+)")
-  self:Print("recognized auction for", quantity, item)
   if quantity then
     self:StartAuction(item, tonumber(quantity))
   else
@@ -246,12 +245,27 @@ end
 
 function PICauction:AnnounceAuction()
   -- TODO: auctioneer price, last previous win price
-  local auctioneerPrice, lastWin = 0, 0
-  descAuc = string.format("Auctioneer price: %s. ", auctioneerPrice)
-  descLastWin = string.format("Last auctioned sold for %s.", lastWin)
+  local auctioneerPrice, lastWin, descAuc = nil, nil, ""
+  if _G.AucAdvanced then
+    auctioneerPrice = AucAdvanced.GetModule("Stat", "Simple").GetPrice(self.auctioning_item)
+    if auctioneerPrice and auctioneerPrice > 0 then
+      auctioneerPrice = math.floor(auctioneerPrice / 10000)
+    else
+      auctioneerPrice = nil
+    end
+  end
+
+  if auctioneerPrice then
+    descAuc = string.format("%sAuctioneer price: %sg. ", descAuc, auctioneerPrice)
+  end
+  if lastWin then
+    descAuc = string.format("%sLast auctioned sold for %s.", descAuc, lastWin)
+  end
 
   local bidformat
   if self.dutch_quantity > 1 then bidformat = '"!bid 2x150"' else bidformat = '"!bid 150"' end
   self:Announce(string.format("Now auctioning: %s. Whisper bids to %s in form %s", self.auctioning_item, GetUnitName("player", false), bidformat))
-  self:Announce(descAuc..descLastWin)
+  if #descAuc > 0 then
+    self:Announce(descAuc)
+  end
 end
