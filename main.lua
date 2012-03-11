@@ -165,7 +165,7 @@ function PICauction:HasOngoingAuction()
 end
 
 function PICauction:ReportWinner(reportfunc)
-  self:Announce(string.format("Auction for %s is over.", self.auctioning_item))
+  reportfunc(self, string.format("Auction for %s is over.", self.auctioning_item))
   -- TODO: loop through winners and report
   winners = self:GetWinners()
   if #winners == 0 then
@@ -277,10 +277,10 @@ function PICauction:AnnounceAuction()
   end
 
   if auctioneerPrice then
-    descAuc = string.format("%sAuctioneer price: %sg. ", descAuc, auctioneerPrice)
+    descAuc = string.format("%sAuctioneer price for %s: %s. ", descAuc, self.auctioning_item, auctioneerPrice)
   end
   if lastWin then
-    descAuc = string.format("%sLast auctioned sold for %s.", descAuc, lastWin)
+    descAuc = string.format("%sLast auctioned %s for %s (on a winning bid of %s).", descAuc, self.auctioning_item, lastWin, lastBid)
   end
 
   local bidformat
