@@ -88,7 +88,7 @@ function PICauction:StartAuction(item, quantity)
   self:ClearAuction()
   self.has_ongoing_auction = true
   self.auctioning_item = item
-  self.dutch_quantity = 1
+  self.dutch_quantity = quantity
 end
 
 function PICauction:EndAuction()
@@ -158,7 +158,7 @@ function PICauction:ReportWinner(reportfunc)
       reportfunc(self, string.format("%s won %s with a bid of %s. %s pays %s", a.who, self.auctioning_item, a.originalbid, a.who, a.bid))
     else
       for k,v in ipairs(winners) do
-        reportfunc(self, string.format("%s won %sx%s with a bid of %s. %s pays %s apiece for a total of %s", a.who, a.quantity, self.auctioning_item, a.originalbid, a.who, a.bid, a.quantity * a.bid))
+        reportfunc(self, string.format("%s won %sx%s with a bid of %s. %s pays %s apiece for a total of %s", v.who, v.quantity, self.auctioning_item, v.originalbid, v.who, v.bid, v.quantity * v.bid))
       end
     end
   end
@@ -178,6 +178,7 @@ function PICauction:HandleBid(event, msg, author, arg3, arg4, arg5, arg6, arg7, 
 
   if self:HasOngoingAuction() then
     if price then
+      self:Print("Got bid", price, author, quantity)
       self:RegisterBid(author, price, quantity)
 
       if self.dutch_quantity == 1 then
@@ -211,7 +212,13 @@ function PICauction:ParseBid(msg, author)
 end
 
 function PICauction:StartBasicAuction(info, item_spec)
-  self:StartAuction(item_spec, 1)
+  quantity, item = string.match(item_spec, "^%s*(%d+)%s*x%s*(.+)")
+  self:Print("recognized auction for", quantity, item)
+  if quantity then
+    self:StartAuction(item, tonumber(quantity))
+  else
+    self:StartAuction(item_spec, 1)
+  end
   self:AnnounceAuction()
 end
 
@@ -227,7 +234,13 @@ function PICauction:StatusReport(info)
        self:ReportWinner(self.Print)
      end
   else
-     self:Print(string.format("Currently auctioning %s. Received %d bids", self.auctioning_item, self.bidcount))
+     local auctiondesc
+     if self.dutch_quantity > 1 then
+       auctiondesc = string.format("%d x %s", self.dutch_quantity, self.auctioning_item)
+     else
+       auctiondesc = self.auctioning_item
+     end
+     self:Print(string.format("Currently auctioning %s. Received %d bids", auctiondesc, self.bidcount))
   end
 end
 
@@ -237,6 +250,8 @@ function PICauction:AnnounceAuction()
   descAuc = string.format("Auctioneer price: %s. ", auctioneerPrice)
   descLastWin = string.format("Last auctioned sold for %s.", lastWin)
 
-  self:Announce(string.format("Now auctioning: %s. Whisper bids to %s in form \"!bid 150\" for 150 gold", self.auctioning_item, GetUnitName("player", false)))
+  local bidformat
+  if self.dutch_quantity > 1 then bidformat = '"!bid 2x150"' else bidformat = '"!bid 150"' end
+  self:Announce(string.format("Now auctioning: %s. Whisper bids to %s in form %s", self.auctioning_item, GetUnitName("player", false), bidformat))
   self:Announce(descAuc..descLastWin)
 end
