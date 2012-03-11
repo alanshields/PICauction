@@ -1,0 +1,13 @@
+## Interface: 40000
+## Title: PIC's bidding tool
+## Notes: Do not require others to have our tool, keep as small as possible
+## Author: Aliset <aliset@fake.domain.name>
+## Version: 0.1
+## SavedVariables: PICAuctionDB
+## OptionalDeps: LibStub, AceAddon-3.0, AceConsole-3.0
+
+#@no-lib-strip@
+embeds.xml
+#@end-no-lib-strip@
+
+main.lua
