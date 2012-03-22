@@ -63,7 +63,7 @@ function PICauction:OnInitialize()
   self.version = string.format("PICauction v%s (r%s)", version, REVISION)
 
   LibStub("AceConfig-3.0"):RegisterOptionsTable("PICauction", self:GetOptions(), {"pica"} )
-  self.db = LibStub("AceDB-3.0"):New("PICauctionDB", PICauction.defaults)
+  self.db = LibStub("AceDB-3.0"):New("PICAuctionDB", PICauction.defaults)
 
   self:ClearAuction()
 end
