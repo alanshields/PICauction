@@ -265,8 +265,8 @@ function PICauction:AnnounceAuction()
   local auctioneerPrice, lastWin, lastBid, descAuc = nil, nil, nil, ""
   if _G.AucAdvanced then
     auctioneerPrice = AucAdvanced.GetModule("Stat", "Simple").GetPrice(self.auctioning_item)
-    if auctioneerPrice and auctioneerPrice > 0 then
-      auctioneerPrice = math.floor(auctioneerPrice / 10000)
+    if auctioneerPrice and tonumber(auctioneerPrice) > 0 then
+      auctioneerPrice = math.floor(tonumber(auctioneerPrice) / 10000)
     else
       auctioneerPrice = nil
     end
