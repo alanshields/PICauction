@@ -45,6 +45,28 @@ PICauction.defaults = {
 
 local channels = {"CHAT_MSG_SAY", "CHAT_MSG_YELL", "CHAT_MSG_WHISPER", "CHAT_MSG_BN_WHISPER", "CHAT_MSG_GUILD", "CHAT_MSG_OFFICER"}
 
+-- Idea from Java Lobby (thanks, Google)
+-- http://www.javalobby.org/forums/thread.jspa?threadID=16906&tstart=0
+local function ordinal(N)
+  N = tonumber(N)
+  local digits = N % 10
+  local tens = N % 100
+
+  if 10 == tens - digits then
+    return N .. "th"
+  else
+    if 1 == digits then
+      return N .. "st"
+    elseif 2 == digits then
+      return N .. "nd"
+    elseif 3 == digits then
+      return N .. "rd"
+    else
+      return N .. "th"
+    end
+  end
+end
+
 local function filterOutBids(self, event, msg, author, ...)
   -- test to see if we're running an auction now
   if PICauction:HasOngoingAuction() and PICauction:ParseBid(msg, author) then
@@ -53,7 +75,7 @@ local function filterOutBids(self, event, msg, author, ...)
 end
 
 local function filterOutBidAcks(self, event, msg, ...)
-  if string.match(msg, "^!Registered bid ") then
+  if string.match(msg, "^!Registered bid: ") then
     return true
   end
 end
@@ -198,13 +220,8 @@ function PICauction:HandleBid(event, msg, author, arg3, arg4, arg5, arg6, arg7, 
     if price then
       self:RegisterBid(author, price, quantity)
 
-      if self.dutch_quantity == 1 then
-        desc = price
-      else
-        desc = string.format("%d x %s", quantity, price)
-      end
-
-      respondTo(string.format("!Registered bid %s for %s. Thank you.",  desc, self.auctioning_item), "WHISPER", nil, author)
+      desc = string.format("!Registered bid: %d x %s for %sg each (%dg total). You are the %s bidder. Thank you.", quantity, self.auctioning_item, price, (quantity * price), ordinal(self.bidcount))
+      respondTo(desc)
     end
   else
     if price then
