@@ -142,7 +142,7 @@ end
 function PICauction:GetWinners()
   local orderedbids = {}
   for k,v in pairs(self.bids) do table.insert(orderedbids, v) end
-  table.sort(orderedbids, function(a,b) return (a.bid > b.bid) end)
+  table.sort(orderedbids, function(a,b) if a.bid == b.bid then return (a.when < b.when) else return (a.bid > b.bid) end end)
 
   local winners, quantitysum = {}, 0
   for k,v in ipairs(orderedbids) do
@@ -171,7 +171,7 @@ function PICauction:RegisterBid(who, bid, quantity)
   if not self.bids[who] then
     self.bidcount = self.bidcount + 1
   end
-  self.bids[who] = {who = who, bid = bid, quantity = quantity}
+  self.bids[who] = {who = who, bid = bid, quantity = quantity, when = GetTime()}
 end
 
 function PICauction:ClearAuction()
@@ -307,4 +307,5 @@ function PICauction:AnnounceAuction()
   if #descAuc > 0 then
     self:Announce(descAuc)
   end
+  self:Announce("Ties will be resolved by when bid was entered (first bid wins).")
 end
